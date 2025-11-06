@@ -1,0 +1,40 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# env
+.env
+.venv/
+venv/
+env/
+
+# Django local DB
+db.sqlite3
+
+# Static & media
+staticfiles/
+media/
+
+# IDEs & OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# uv lock is recommended to commit for reproducible installs, but if you prefer ignore:
+# uv.lock

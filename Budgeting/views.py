@@ -3,8 +3,10 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from django.contrib import messages
 from django.utils import timezone
+from django.http import JsonResponse
 from datetime import datetime, timedelta
 from decimal import Decimal
+import calendar
 from .models import MonthlyBudget, Category, Transaction, DailySummary, MonthlySummary, Goal
 
 User = get_user_model()
@@ -510,3 +512,204 @@ def quick_add_transaction(request):
     }
     
     return render(request, 'Budgeting/quick_add_transaction.html', context)
+
+
+@login_required(login_url='login')
+def calendar_view(request):
+    """Calendar view with daily spending totals"""
+    user = request.user
+    active_budget = MonthlyBudget.objects.filter(user=user, is_active=True).first()
+    
+    if not active_budget:
+        messages.warning(request, 'Please set up your budget first.')
+        return redirect('budget_setup')
+    
+    # Get month and year from query params or use current
+    year = int(request.GET.get('year', timezone.now().year))
+    month = int(request.GET.get('month', timezone.now().month))
+    
+    # Get calendar data
+    cal = calendar.monthcalendar(year, month)
+    
+    # Get all transactions for this month
+    first_day = datetime(year, month, 1).date()
+    if month == 12:
+        last_day = datetime(year + 1, 1, 1).date() - timedelta(days=1)
+    else:
+        last_day = datetime(year, month + 1, 1).date() - timedelta(days=1)
+    
+    transactions = Transaction.objects.filter(
+        monthly_budget=active_budget,
+        date__gte=first_day,
+        date__lte=last_day
+    )
+    
+    # Create daily summary dict
+    daily_data = {}
+    for transaction in transactions:
+        date_key = transaction.date.strftime('%Y-%m-%d')
+        if date_key not in daily_data:
+            daily_data[date_key] = {'income': 0, 'expense': 0, 'net': 0, 'transactions': []}
+        
+        if transaction.transaction_type == 'income':
+            daily_data[date_key]['income'] += float(transaction.amount)
+        else:
+            daily_data[date_key]['expense'] += float(transaction.amount)
+        
+        daily_data[date_key]['net'] = daily_data[date_key]['income'] - daily_data[date_key]['expense']
+        daily_data[date_key]['transactions'].append(transaction)
+    
+    # Calculate navigation dates
+    if month == 1:
+        prev_month = 12
+        prev_year = year - 1
+    else:
+        prev_month = month - 1
+        prev_year = year
+    
+    if month == 12:
+        next_month = 1
+        next_year = year + 1
+    else:
+        next_month = month + 1
+        next_year = year
+    
+    context = {
+        'active_budget': active_budget,
+        'calendar': cal,
+        'year': year,
+        'month': month,
+        'month_name': calendar.month_name[month],
+        'daily_data': daily_data,
+        'prev_year': prev_year,
+        'prev_month': prev_month,
+        'next_year': next_year,
+        'next_month': next_month,
+    }
+    
+    return render(request, 'Budgeting/calendar_dashboard.html', context)
+
+
+@login_required(login_url='login')
+def goals_list(request):
+    """View all goals"""
+    user = request.user
+    active_goals = Goal.objects.filter(user=user, is_completed=False).order_by('target_date')
+    completed_goals = Goal.objects.filter(user=user, is_completed=True).order_by('-updated_at')
+    
+    context = {
+        'active_goals': active_goals,
+        'completed_goals': completed_goals,
+    }
+    
+    return render(request, 'Budgeting/goals.html', context)
+
+
+@login_required(login_url='login')
+def create_goal(request):
+    """Create a new goal"""
+    if request.method == 'POST':
+        title = request.POST.get('title', '').strip()
+        target_amount = request.POST.get('target_amount')
+        target_date = request.POST.get('target_date')
+        
+        errors = []
+        
+        if not title:
+            errors.append('Goal title is required')
+        
+        if not target_amount:
+            errors.append('Target amount is required')
+        else:
+            try:
+                target_amount = Decimal(target_amount)
+                if target_amount <= 0:
+                    errors.append('Target amount must be greater than 0')
+            except:
+                errors.append('Invalid target amount')
+        
+        if not target_date:
+            errors.append('Target date is required')
+        else:
+            try:
+                target_date = datetime.strptime(target_date, '%Y-%m-%d').date()
+                if target_date <= timezone.now().date():
+                    errors.append('Target date must be in the future')
+            except:
+                errors.append('Invalid date format')
+        
+        if errors:
+            messages.error(request, ' '.join(errors))
+            return redirect('goals_list')
+        
+        Goal.objects.create(
+            user=request.user,
+            title=title,
+            target_amount=target_amount,
+            target_date=target_date
+        )
+        
+        messages.success(request, f'Goal "{title}" created successfully!')
+        return redirect('goals_list')
+    
+    return redirect('goals_list')
+
+
+@login_required(login_url='login')
+def update_goal_progress(request, goal_id):
+    """Update goal progress"""
+    goal = get_object_or_404(Goal, goalId=goal_id, user=request.user)
+    
+    if request.method == 'POST':
+        progress = request.POST.get('progress')
+        
+        try:
+            progress = Decimal(progress)
+            if progress < 0:
+                messages.error(request, 'Progress cannot be negative')
+            elif progress > goal.target_amount:
+                messages.error(request, 'Progress cannot exceed target amount')
+            else:
+                goal.current_progress = progress
+                
+                # Check if goal is completed
+                if progress >= goal.target_amount:
+                    goal.is_completed = True
+                    messages.success(request, f'🎉 Congratulations! Goal "{goal.title}" completed!')
+                else:
+                    goal.is_completed = False
+                
+                goal.save()
+                messages.success(request, 'Goal progress updated successfully!')
+        except:
+            messages.error(request, 'Invalid progress amount')
+    
+    return redirect('goals_list')
+
+
+@login_required(login_url='login')
+def delete_goal(request, goal_id):
+    """Delete a goal"""
+    goal = get_object_or_404(Goal, goalId=goal_id, user=request.user)
+    
+    if request.method == 'POST':
+        goal_title = goal.title
+        goal.delete()
+        messages.success(request, f'Goal "{goal_title}" deleted successfully!')
+    
+    return redirect('goals_list')
+
+
+@login_required(login_url='login')
+def toggle_goal_completion(request, goal_id):
+    """Toggle goal completion status"""
+    goal = get_object_or_404(Goal, goalId=goal_id, user=request.user)
+    
+    if request.method == 'POST':
+        goal.is_completed = not goal.is_completed
+        goal.save()
+        
+        status = 'completed' if goal.is_completed else 'reopened'
+        messages.success(request, f'Goal "{goal.title}" {status}!')
+    
+    return redirect('goals_list')

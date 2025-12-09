@@ -38,7 +38,13 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'UserAuth',
     'Budgeting',
+    "tailwind",
+    "theme",
 ]
+## Tailwind Config ##
+TAILWIND_APP_NAME = "theme"
+NPM_BIN_PATH = "npm.cmd"
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

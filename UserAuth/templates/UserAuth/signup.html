@@ -1,0 +1,178 @@
+{% load static tailwind_tags %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DPBS - Sign up</title>
+    {% tailwind_css %}
+  </head>
+
+  <body class="font-sans bg-slate-900">
+    <div class="relative min-h-screen">
+      <div
+        class="absolute inset-0 bg-cover bg-center"
+        style="background-image: url('{% static 'images/Rectangle1.jpg' %}');"
+      ></div>
+
+      <!-- <div class="absolute inset-0 bg-blue-400 bg-opacity-30"></div> -->
+
+      <div
+        class="relative z-10 flex flex-col min-h-screen text-gray-200 justify-center"
+      >
+        <header class="container mx-auto px-6 py-6">
+          <nav class="flex justify-between items-center px-4 md:px-5">
+            <a href="#" class="text-3xl font-bold text-white font-pacifico">
+              DPBS
+            </a>
+
+            <ul
+              class="md:flex items-center space-x-8 text-gray-300 font-crimson text-lg hidden"
+            >
+              <li>
+                <a href="#" class="hover:text-white transition-colors">Home</a>
+              </li>
+              <li>
+                <a href="#" class="hover:text-white transition-colors">About</a>
+              </li>
+              <li>
+                <a href="#" class="hover:text-white transition-colors">Login</a>
+              </li>
+              <li>
+                <a href="#" class="hover:text-white transition-colors"
+                  >Contact us</a
+                >
+              </li>
+            </ul>
+            <div class="md:hidden">
+              <a class="text-4xl text-white" href="#">&#8801;</a>
+            </div>
+          </nav>
+        </header>
+
+        <main
+          class="flex-grow flex flex-col justify-center items-center text-center px-4"
+        >
+          <div
+            class="w-full max-w-md p-8 md:p-10 rounded-2xl shadow-2xl bg-[#2A5172]/70 bg-opacity-40 border border-white border-opacity-20 backdrop-blur-lg"
+          >
+            <h2 class="font-serif text-3xl font-bold text-white mb-3">
+              WELCOME TO DPBS!
+            </h2>
+
+            <p class="font-sans text-gray-300 mb-8">
+              Create your account, and start managing your budget with DPBS
+              today.
+            </p>
+
+            <form id="signup-form" class="space-y-5">
+              <div
+                id="error-message"
+                class="hidden text-left text-red-400 text-sm -mt-2 mb-3"
+              >
+                Please fill in all fields.
+              </div>
+              <input
+                type="text"
+                id="full-name"
+                placeholder="full name"
+                class="w-full py-3 px-5 rounded-full bg-white bg-opacity-10 border border-white border-opacity-30 text-gray-900 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-white/50"
+              />
+
+              <input
+                type="text"
+                id="username"
+                placeholder="username or email"
+                class="w-full py-3 px-5 rounded-full bg-white bg-opacity-10 border border-white border-opacity-30 text-gray-900 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-white/50"
+              />
+
+              <input
+                type="password"
+                id="password"
+                placeholder="password"
+                class="w-full py-3 px-5 rounded-full bg-white bg-opacity-10 border border-white border-opacity-30 text-gray-900 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-white/50"
+              />
+
+              <input
+                type="password"
+                id="confirm-password"
+                placeholder="confirm password"
+                class="w-full py-3 px-5 rounded-full bg-white bg-opacity-10 border border-white border-opacity-30 text-gray-900 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-white/50"
+              />
+
+              <button
+                type="submit"
+                class="w-full py-3 px-5 rounded-full font-bold text-white bg-[#0C2B58] hover:bg-indigo-950 cursor-pointer border-[#CCCFD1] border-1"
+              >
+                SIGN UP
+              </button>
+            </form>
+
+            <p class="font-sans text-sm text-gray-300 mt-6">
+              Already have an account?
+              <a
+                href="{% url 'login' %}"
+                class="font-semibold text-white hover:underline"
+                >Login</a
+              >
+            </p>
+          </div>
+        </main>
+
+        <footer
+          class="container mx-auto px-6 py-4 text-center text-gray-400 text-sm"
+        >
+          <p>© 2025 Dynamic Personal Budget Simulator | UET Peshawar</p>
+        </footer>
+      </div>
+    </div>
+
+    <script>
+      const form = document.getElementById("signup-form");
+
+      const fullName = document.getElementById("full-name");
+      const username = document.getElementById("username");
+      const password = document.getElementById("password");
+      const confirmPassword = document.getElementById("confirm-password");
+      const errorMessage = document.getElementById("error-message");
+
+      form.addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        const nameVal = fullName.value.trim();
+        const userVal = username.value.trim();
+        const passVal = password.value.trim();
+        const confirmVal = confirmPassword.value.trim();
+
+        // Check empty fields
+        if (
+          nameVal === "" ||
+          userVal === "" ||
+          passVal === "" ||
+          confirmVal === ""
+        ) {
+          errorMessage.innerText = "Please fill in all fields.";
+          errorMessage.classList.remove("hidden");
+          return;
+        }
+
+        // Check password match
+        if (passVal !== confirmVal) {
+          errorMessage.innerText = "Passwords do not match.";
+          errorMessage.classList.remove("hidden");
+          return;
+        }
+
+        // Hide errors
+        errorMessage.classList.add("hidden");
+
+        // Dummy success (you can replace with API call)
+        alert("Signup successful! (Demo)");
+
+        // Optional redirect
+        // window.location.href = "login.html";
+      });
+    </script>
+  </body>
+</html>

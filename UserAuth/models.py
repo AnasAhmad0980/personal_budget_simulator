@@ -33,7 +33,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     userId = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
     email = models.EmailField(max_length=255, unique=True)
-    password = models.CharField(max_length=255)
+    # password = models.CharField(max_length=255)
     date_joined = models.DateTimeField(default=timezone.now)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)

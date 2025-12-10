@@ -13,7 +13,7 @@
     <div class="relative min-h-screen">
       <div
         class="absolute inset-0 bg-cover bg-center"
-        style="background-image: url('{% static 'images/Rectangle1.jpg' %}');"
+        style="background-image: url('{% static 'images/Rectangle1.jpg' %}')"
       ></div>
 
       <!-- <div class="absolute inset-0 bg-blue-400 bg-opacity-30"></div> -->
@@ -65,25 +65,39 @@
               Sign in to see your monthly budget and dashboard
             </p>
 
-            <form id="login-form" class="space-y-5">
-              <div
+            <form
+              id="login-form"
+              method="POST"
+              action="{% url 'login' %}"
+              class="space-y-5"
+            >
+              {% csrf_token %}
+              {% comment %} <div
                 id="error-message"
                 class="hidden text-left text-red-400 text-sm -mt-2 mb-3"
               >
                 Please fill in all fields.
+              </div> {% endcomment %}
+              {% if errors %} {% for error in errors %}
+              <div class="text-left text-red-400 text-sm -mt-2 mb-3">
+                {{ error }}
               </div>
+              {% endfor %} {% endif %}
 
               <input
-                type="text"
-                id="username"
-                placeholder="username or email"
+                type="email"
+                id="email"
+                name="email"
+                placeholder="Your Email"
+                value="{{email}}"
                 class="w-full py-3 px-5 rounded-full bg-white bg-opacity-10 border border-white border-opacity-30 text-gray-900 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-white/50"
               />
 
               <input
                 type="password"
                 id="password"
-                placeholder="password"
+                name="password"
+                placeholder="Password"
                 class="w-full py-3 px-5 rounded-full bg-white bg-opacity-10 border border-white border-opacity-30 text-gray-900 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-white/50"
               />
 
@@ -117,19 +131,19 @@
     <script>
       // Select elements
       const form = document.getElementById("login-form");
-      const usernameInput = document.getElementById("username");
+      const emailInput = document.getElementById("email");
       const passwordInput = document.getElementById("password");
       const errorMessage = document.getElementById("error-message");
 
       // Form submit event
       form.addEventListener("submit", function (event) {
-        event.preventDefault(); // stop page refresh
+        {% comment %} event.preventDefault(); // stop page refresh {% endcomment %}
 
-        const username = usernameInput.value.trim();
+        const email = emailInput.value.trim();
         const password = passwordInput.value.trim();
 
         // Check empty fields
-        if (username === "" || password === "") {
+        if (email === "" || password === "") {
           errorMessage.classList.remove("hidden"); // show error
           return;
         }
@@ -138,7 +152,7 @@
         errorMessage.classList.add("hidden");
 
         // Temporary success message (you can replace with real API later)
-        alert("Login successful (demo)");
+        {% comment %} alert("Login successful (demo)"); {% endcomment %}
 
         // Redirect example (optional)
         // window.location.href = "dashboard.html";

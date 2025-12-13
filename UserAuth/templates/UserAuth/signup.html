@@ -13,7 +13,7 @@
     <div class="relative min-h-screen">
       <div
         class="absolute inset-0 bg-cover bg-center"
-        style="background-image: url('{% static 'images/Rectangle1.jpg' %}');"
+        style="background-image: url('{% static 'images/Rectangle1.jpg' %}')"
       ></div>
 
       <!-- <div class="absolute inset-0 bg-blue-400 bg-opacity-30"></div> -->
@@ -66,38 +66,54 @@
               today.
             </p>
 
-            <form id="signup-form" class="space-y-5">
+            <form
+              id="signup-form"
+              method="POST"
+              action="{% url 'signup' %}"
+              class="space-y-5"
+            >
+              {% csrf_token %}
               <div
                 id="error-message"
-                class="hidden text-left text-red-400 text-sm -mt-2 mb-3"
+                class="text-left text-red-400 text-sm -mt-2 mb-3 {% if not errors %}hidden{% endif %}"
               >
-                Please fill in all fields.
+                {% if errors %} {% for error in errors %}
+                <div
+                  class="bg-red-500/10 p-2 rounded border border-red-500/50 mb-2"
+                >
+                  ⚠️ {{ error }}
+                </div>
+                {% endfor %} {% endif %}
               </div>
               <input
                 type="text"
                 id="full-name"
-                placeholder="full name"
+                name="name"
+                placeholder="Full name"
                 class="w-full py-3 px-5 rounded-full bg-white bg-opacity-10 border border-white border-opacity-30 text-gray-900 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-white/50"
               />
 
               <input
                 type="text"
-                id="username"
-                placeholder="username or email"
+                id="email"
+                name="email"
+                placeholder="Email"
                 class="w-full py-3 px-5 rounded-full bg-white bg-opacity-10 border border-white border-opacity-30 text-gray-900 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-white/50"
               />
 
               <input
                 type="password"
                 id="password"
-                placeholder="password"
+                name="password"
+                placeholder="Password"
                 class="w-full py-3 px-5 rounded-full bg-white bg-opacity-10 border border-white border-opacity-30 text-gray-900 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-white/50"
               />
 
               <input
                 type="password"
                 id="confirm-password"
-                placeholder="confirm password"
+                name="confirm_password"
+                placeholder="Confirm password"
                 class="w-full py-3 px-5 rounded-full bg-white bg-opacity-10 border border-white border-opacity-30 text-gray-900 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-white/50"
               />
 
@@ -130,48 +146,43 @@
 
     <script>
       const form = document.getElementById("signup-form");
-
-      const fullName = document.getElementById("full-name");
-      const username = document.getElementById("username");
-      const password = document.getElementById("password");
-      const confirmPassword = document.getElementById("confirm-password");
       const errorMessage = document.getElementById("error-message");
 
       form.addEventListener("submit", function (event) {
-        event.preventDefault();
+        const fullName = document.getElementById("full-name").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value.trim();
+        const confirmPassword = document
+          .getElementById("confirm-password")
+          .value.trim();
 
-        const nameVal = fullName.value.trim();
-        const userVal = username.value.trim();
-        const passVal = password.value.trim();
-        const confirmVal = confirmPassword.value.trim();
+        let errorText = "";
 
-        // Check empty fields
+        // 1. Check empty fields
         if (
-          nameVal === "" ||
-          userVal === "" ||
-          passVal === "" ||
-          confirmVal === ""
+          fullName === "" ||
+          email === "" ||
+          password === "" ||
+          confirmPassword === ""
         ) {
-          errorMessage.innerText = "Please fill in all fields.";
-          errorMessage.classList.remove("hidden");
-          return;
+          errorText = "Please fill in all fields.";
+        }
+        // 2. Check password match
+        else if (password !== confirmPassword) {
+          errorText = "Passwords do not match.";
         }
 
-        // Check password match
-        if (passVal !== confirmVal) {
-          errorMessage.innerText = "Passwords do not match.";
+        // If we found a frontend error, stop submission and show it
+        if (errorText) {
+          event.preventDefault();
           errorMessage.classList.remove("hidden");
-          return;
+          // Use innerHTML to keep the red styling consistent with backend errors
+          errorMessage.innerHTML = `
+        <div class="bg-red-500/10 p-2 rounded border border-red-500/50 mb-2">
+           ⚠️ ${errorText}
+        </div>
+      `;
         }
-
-        // Hide errors
-        errorMessage.classList.add("hidden");
-
-        // Dummy success (you can replace with API call)
-        alert("Signup successful! (Demo)");
-
-        // Optional redirect
-        // window.location.href = "login.html";
       });
     </script>
   </body>

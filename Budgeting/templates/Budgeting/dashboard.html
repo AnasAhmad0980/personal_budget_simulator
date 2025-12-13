@@ -5,7 +5,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>DPBS - Dashboard</title>
     {% tailwind_css %}
   </head>
 
@@ -15,10 +15,14 @@
         class="absolute inset-0 bg-cover bg-center"
         style="background-image: url('{% static 'images/Rectangle1.jpg' %}')"
       ></div>
+
       <div class="relative z-10 flex flex-col min-h-screen text-gray-200">
         <header class="container mx-auto px-6 py-6">
           <nav class="flex justify-between items-center px-4 md:px-5">
-            <a href="#" class="text-3xl font-bold text-white font-pacifico">
+            <a
+              href="{% url 'budgeting_dashboard' %}"
+              class="text-3xl font-bold text-white font-pacifico"
+            >
               DPBS
             </a>
 
@@ -27,8 +31,8 @@
             >
               <img
                 class="object-cover h-full w-full rounded-full"
-                src="./Icons/profile-pic.jpg"
-                alt=""
+                src="{% static 'images/profile-pic.jpg' %}"
+                alt="Profile"
               />
             </div>
 
@@ -41,131 +45,150 @@
         <div
           class="flex justify-between min-h-screen mx-6 my-6 relative bg-white/30"
         >
-          <!-- SiderBar -->
           <div
             class="bg-[#2A5172]/70 right-0.5 border-[#CCCFD1] border flex flex-col items-center justify-between rounded-2xl min-w-[200px]"
           >
             <div
-              class="text-white flex items-center px-4 py-3 flex-col space-y-7 m-5 font-serif"
+              class="text-white flex items-center px-4 py-3 flex-col space-y-7 m-5 font-serif w-full"
             >
               <a
                 class="px-4 py-2 mt-2 w-full text-center bg-white/50 rounded-3xl hover:bg-white/70"
-                href=""
+                href="{% url 'budgeting_dashboard' %}"
                 >Dashboard</a
               >
               <a
                 class="px-4 py-2 mt-2 w-full text-center bg-white/50 rounded-3xl hover:bg-white/70"
-                href=""
-                >Reports</a
+                href="{% url 'transactions_list' %}"
+                >Transactions</a
               >
               <a
                 class="px-4 py-2 mt-2 w-full text-center bg-white/50 rounded-3xl hover:bg-white/70"
-                href=""
+                href="{% url 'budget_setup' %}"
                 >Monthly Setup</a
               >
               <a
                 class="px-4 py-2 mt-2 w-full text-center bg-white/50 rounded-3xl hover:bg-white/70"
-                href=""
+                href="{% url 'add_transaction' %}"
                 >Add Transaction</a
               >
               <a
                 class="px-4 py-2 mt-2 w-full text-center bg-white/50 rounded-3xl hover:bg-white/70"
-                href=""
+                href="{% url 'goals_list' %}"
                 >Add Goal</a
               >
             </div>
+
             <div
-              class="text-white flex items-center px-4 py-3 flex-col space-y-5 m-5 font-serif"
+              class="text-white flex items-center px-4 py-3 flex-col space-y-5 m-5 font-serif w-full"
             >
-              <a class="text-red-500 flex items-center" href=""
+              <a
+                class="text-red-500 flex items-center"
+                href="{% url 'transactions_list' %}?type=expense"
                 ><span class="text-4xl px-0.5">&#8901; </span>expense</a
               >
-              <a class="text-green-500 flex items-center" href=""
+              <a
+                class="text-green-500 flex items-center"
+                href="{% url 'transactions_list' %}?type=income"
                 ><span class="text-4xl px-0.5">&#8901; </span>income</a
               >
               <a
                 class="w-full text-center px-4 py-2 mt-2 bg-white/50 rounded-3xl font-serif hover:bg-white/70"
-                href=""
-                >View Charts</a
+                href="{% url 'calendar_dashboard' %}"
+                >View Calendar</a
               >
             </div>
           </div>
 
-          <!-- Calender -->
           <div
-            class="bg-[#2A5172]/70 right-0.5 border-[#CCCFD1] border flex flex-col items-center justify-between rounded-2xl h-[700px] w-[700px]"
-          ></div>
+            class="bg-[#2A5172]/70 right-0.5 border-[#CCCFD1] border flex flex-col items-center justify-center rounded-2xl h-[700px] w-[700px] text-white font-serif"
+          >
+            {% if not active_budget %}
+            <p>No active budget found.</p>
+            <a href="{% url 'budget_setup' %}" class="underline text-blue-300"
+              >Create one now</a
+            >
+            {% else %}
+            <p class="text-2xl opacity-50">Calendar / Overview</p>
+            <p class="text-sm opacity-50">
+              Select "View Calendar" in sidebar for details
+            </p>
+            {% endif %}
+          </div>
 
           <div
             class="bg-[#2A5172]/70 right-0.5 border-[#CCCFD1] border flex flex-col items-center justify-between rounded-2xl min-w-[340px]"
           >
-            <!-- Balance -->
             <div
-              class="bg-white/20 w-2xs h-2xs mx-6 my-6 flex flex-col space-y-2 px-6 py-6 rounded-2xl border-[#CCCFD1] border"
+              class="bg-white/20 w-2xs h-2xs mx-6 my-6 flex flex-col space-y-2 px-6 py-6 rounded-2xl border-[#CCCFD1] border w-[90%]"
             >
               <div class="text-2xl font-semibold font-serif text-white">
                 This month
               </div>
               <div class="flex justify-between text-white font-serif">
                 <p>Budget</p>
-                <p>30,000</p>
+                <p>{{ total_budget|default:"0" }}</p>
               </div>
               <div class="flex justify-between text-white font-serif">
                 <p>Spent</p>
-                <p>10,000</p>
+                <p>{{ total_spent|default:"0" }}</p>
               </div>
               <div class="flex justify-between text-white font-serif">
                 <p>Remaining</p>
-                <p>20,000</p>
+                <p
+                  class="{% if remaining_balance < 0 %}text-red-300{% endif %}"
+                >
+                  {{ remaining_balance|default:"0" }}
+                </p>
               </div>
             </div>
-            <!-- Goals -->
+
             <div
-              class="bg-white/20 w-2xs h-2xs mx-6 my-6 flex flex-col space-y-2 px-6 py-6 rounded-2xl border-[#CCCFD1] border"
+              class="bg-white/20 w-2xs h-2xs mx-6 my-6 flex flex-col space-y-2 px-6 py-6 rounded-2xl border-[#CCCFD1] border w-[90%] overflow-y-auto max-h-[200px]"
             >
-              <div class="text-2xl font-semibold font-serif text-white">
+              <div class="text-2xl font-semibold font-serif text-white mb-2">
                 Goals
               </div>
-              <div class="flex justify-between text-white font-serif">
-                <p>Phone</p>
-                <p>30,000</p>
-              </div>
-              <div class="h-1.5 w-full rounded-full bg-gray-400/30">
-                <div class="h-full w-[70%] rounded-full bg-white"></div>
-              </div>
 
-              <div class="flex justify-between text-white font-serif">
-                <p>Vacation</p>
-                <p>10,000</p>
+              {% if goals %} {% for goal in goals %}
+              <div class="flex justify-between text-white font-serif text-sm">
+                <p>{{ goal.title }}</p>
+                <p>{{ goal.target_amount }}</p>
               </div>
-              <div class="h-1.5 w-full rounded-full bg-gray-400/30">
-                <div class="h-full w-[40%] rounded-full bg-white"></div>
+              <div class="h-1.5 w-full rounded-full bg-gray-400/30 mb-2">
+                <div
+                  class="h-full rounded-full bg-white"
+                  style="width: {% widthratio goal.current_progress goal.target_amount 100 %}%"
+                ></div>
               </div>
+              {% endfor %} {% else %}
+              <p class="text-white/50 text-sm">No active goals.</p>
+              {% endif %}
             </div>
+
             <div
-              class="bg-white/20 w-2xs h-2xs mx-6 my-6 flex flex-col space-y-2 px-6 py-6 rounded-2xl border-[#CCCFD1] border"
+              class="bg-white/20 w-2xs h-2xs mx-6 my-6 flex flex-col space-y-2 px-6 py-6 rounded-2xl border-[#CCCFD1] border w-[90%]"
             >
               <div class="text-2xl font-semibold font-serif text-white">
                 Category Snapshot
               </div>
-              <div class="flex justify-between text-white font-serif">
+
+              {% if categories_summary %}
+              <div class="flex justify-between text-white font-serif mt-2">
                 <div class="flex items-center space-x-5">
                   <div
-                    class="relative flex h-25 w-25 items-center justify-center rounded-full border-[1.5px] border-blue-100"
+                    class="relative flex h-25 w-25 items-center justify-center rounded-full border-[1.5px] border-blue-100 min-w-[100px] min-h-[100px]"
                   >
                     <div class="absolute h-full w-full rotate-0">
                       <div
                         class="mx-auto h-[50%] w-[1.5px] bg-blue-100 origin-bottom"
                       ></div>
                     </div>
-
-                    <div class="absolute h-full w-full rotate-[108deg]">
+                    <div class="absolute h-full w-full rotate-[120deg]">
                       <div
                         class="mx-auto h-[50%] w-[1.5px] bg-blue-100 origin-bottom"
                       ></div>
                     </div>
-
-                    <div class="absolute h-full w-full rotate-[216deg]">
+                    <div class="absolute h-full w-full rotate-[240deg]">
                       <div
                         class="mx-auto h-[50%] w-[1.5px] bg-blue-100 origin-bottom"
                       ></div>
@@ -186,20 +209,27 @@
                   </div>
 
                   <div
-                    class="flex flex-col space-y-2 font-serif text-[17px] leading-relaxed text-blue-50"
+                    class="flex flex-col space-y-2 font-serif text-[15px] leading-relaxed text-blue-50"
                   >
+                    {% for cat in categories_summary|slice:":3" %}
                     <div class="flex gap-2">
-                      <span>a</span> <span>-</span> <span>Food 30%</span>
+                      <span class="font-bold text-blue-200">
+                        {% cycle 'a' 'b' 'c' %}
+                      </span>
+                      <span>-</span>
+                      <span class="truncate max-w-[100px]">{{ cat.name }}</span>
                     </div>
-                    <div class="flex gap-2">
-                      <span>b</span> <span>-</span> <span>Travel 30%</span>
-                    </div>
-                    <div class="flex gap-2">
-                      <span>c</span> <span>-</span> <span>Others 30%</span>
-                    </div>
+                    {% endfor %}{% if categories_summary|length == 0 %}
+                    <span class="text-sm opacity-50">No data yet</span>
+                    {% endif %}
                   </div>
                 </div>
               </div>
+              {% else %}
+              <p class="text-white/50 text-sm mt-2">
+                Add transactions to see breakdown.
+              </p>
+              {% endif %}
             </div>
           </div>
         </div>

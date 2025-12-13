@@ -72,17 +72,18 @@
               class="space-y-5"
             >
               {% csrf_token %}
-              {% comment %} <div
+              <div
                 id="error-message"
-                class="hidden text-left text-red-400 text-sm -mt-2 mb-3"
+                class="text-left text-red-400 text-sm -mt-2 mb-3 {% if not errors %}hidden{% endif %}"
               >
-                Please fill in all fields.
-              </div> {% endcomment %}
-              {% if errors %} {% for error in errors %}
-              <div class="text-left text-red-400 text-sm -mt-2 mb-3">
-                {{ error }}
+                {% if errors %} {% for error in errors %}
+                <div
+                  class="bg-red-500/10 p-2 rounded border border-red-500/50 mb-2"
+                >
+                  ⚠️ {{ error }}
+                </div>
+                {% endfor %} {% endif %}
               </div>
-              {% endfor %} {% endif %}
 
               <input
                 type="email"

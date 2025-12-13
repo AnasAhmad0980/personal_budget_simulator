@@ -18,7 +18,7 @@ urlpatterns = [
     path('transactions/quick-add/', views.quick_add_transaction, name='quick_add_transaction'),
     
     # Calendar
-    path('calendar/', views.calendar_view, name='calendar_view'),
+    path('calendar/', views.calendar_view, name='calendar_dashboard'),
     
     # Goals
     path('goals/', views.goals_list, name='goals_list'),

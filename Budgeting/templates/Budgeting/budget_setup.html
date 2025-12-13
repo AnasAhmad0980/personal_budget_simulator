@@ -1,0 +1,254 @@
+{% load static tailwind_tags %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DPBS - Budget Setup</title>
+
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://npmcdn.com/flatpickr/dist/themes/dark.css"
+    />
+
+    <style>
+      /* Override Flatpickr to match your Glassmorphism Theme */
+      .flatpickr-calendar {
+        background: #1e293b !important; /* Matches slate-800 */
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5) !important;
+      }
+      .flatpickr-months .flatpickr-month {
+        background: #0c2b58 !important; /* Matches your Button Color */
+        color: #fff !important;
+        border-top-left-radius: 5px;
+        border-top-right-radius: 5px;
+        fill: #fff !important;
+      }
+      .flatpickr-current-month .flatpickr-monthDropdown-months,
+      .flatpickr-current-month input.cur-year {
+        color: #fff !important;
+        font-weight: bold;
+      }
+      .flatpickr-weekdays {
+        background: #0c2b58 !important;
+      }
+      span.flatpickr-weekday {
+        color: #cbd5e1 !important; /* Light gray text */
+      }
+      .flatpickr-day {
+        color: #e2e8f0 !important; /* Text color */
+      }
+      .flatpickr-day.selected,
+      .flatpickr-day.startRange,
+      .flatpickr-day.endRange,
+      .flatpickr-day.selected.inRange,
+      .flatpickr-day.startRange.inRange,
+      .flatpickr-day.endRange.inRange,
+      .flatpickr-day.selected:focus,
+      .flatpickr-day.startRange:focus,
+      .flatpickr-day.endRange:focus,
+      .flatpickr-day.selected:hover,
+      .flatpickr-day.startRange:hover,
+      .flatpickr-day.endRange:hover,
+      .flatpickr-day.selected.prevMonthDay,
+      .flatpickr-day.startRange.prevMonthDay,
+      .flatpickr-day.endRange.prevMonthDay,
+      .flatpickr-day.selected.nextMonthDay,
+      .flatpickr-day.startRange.nextMonthDay,
+      .flatpickr-day.endRange.nextMonthDay {
+        background: #2a5172 !important; /* Your secondary blue */
+        border-color: #2a5172 !important;
+      }
+      .flatpickr-day:hover {
+        background: #334155 !important; /* Dark hover effect */
+      }
+    </style>
+
+    {% tailwind_css %}
+  </head>
+
+  <body class="font-sans bg-slate-900">
+    <div class="relative min-h-screen">
+      <div
+        class="absolute inset-0 bg-cover bg-center"
+        style="background-image: url('{% static 'images/Rectangle1.jpg' %}')"
+      ></div>
+
+      <div
+        class="relative z-10 flex flex-col min-h-screen text-gray-200 justify-center"
+      >
+        <header class="container mx-auto px-6 py-6">
+          <nav class="flex justify-between items-center px-4 md:px-5">
+            <a href="#" class="text-3xl font-bold text-white font-pacifico">
+              DPBS
+            </a>
+
+            <ul
+              class="md:flex items-center space-x-8 text-gray-300 font-crimson text-lg hidden"
+            >
+              <li>
+                <a
+                  href="{% url 'budgeting_dashboard' %}"
+                  class="hover:text-white transition-colors"
+                  >Dashboard</a
+                >
+              </li>
+              <li>
+                <a
+                  href="{% url 'logout' %}"
+                  class="hover:text-white transition-colors"
+                  >Logout</a
+                >
+              </li>
+            </ul>
+            <div class="md:hidden">
+              <a class="text-4xl text-white" href="#">&#8801;</a>
+            </div>
+          </nav>
+        </header>
+
+        <main
+          class="flex-grow flex flex-col justify-center items-center text-center px-4"
+        >
+          <div
+            class="w-full max-w-md p-8 md:p-10 rounded-2xl shadow-2xl bg-[#2A5172]/70 bg-opacity-40 border border-white border-opacity-20 backdrop-blur-lg"
+          >
+            <h2 class="font-serif text-3xl font-bold text-white mb-3">
+              SETUP MONTHLY BUDGET
+            </h2>
+
+            <p class="font-sans text-gray-300 mb-8">
+              Define your spending limit and start date to begin tracking.
+            </p>
+
+            <form
+              id="budget-form"
+              method="POST"
+              action="{% url 'budget_setup' %}"
+              class="space-y-5"
+            >
+              {% csrf_token %}
+
+              <div
+                id="error-message"
+                class="text-left text-red-400 text-sm -mt-2 mb-3 {% if not errors %}hidden{% endif %}"
+              >
+                {% if errors %} {% for error in errors %}
+                <div
+                  class="bg-red-500/10 p-2 rounded border border-red-500/50 mb-2"
+                >
+                  ⚠️ {{ error }}
+                </div>
+                {% endfor %} {% endif %}
+              </div>
+
+              <div class="text-left">
+                <label
+                  for="total_budget"
+                  class="text-gray-300 text-sm ml-4 mb-1 block"
+                  >Total Budget Amount</label
+                >
+                <input
+                  type="number"
+                  step="0.01"
+                  id="total_budget"
+                  name="total_budget"
+                  value="{{ total_budget }}"
+                  placeholder="e.g. 50000"
+                  class="w-full py-3 px-5 rounded-full bg-white bg-opacity-10 border border-white border-opacity-30 text-gray-900 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-white/50"
+                />
+              </div>
+
+              <div class="text-left">
+                <label
+                  for="start_date"
+                  class="text-gray-300 text-sm ml-4 mb-1 block"
+                  >Start Date</label
+                >
+                <input
+                  type="text"
+                  id="start_date"
+                  name="start_date"
+                  value="{{ start_date|date:'Y-m-d' }}"
+                  placeholder="Select Start Date"
+                  class="w-full py-3 px-5 rounded-full bg-white bg-opacity-10 border border-white border-opacity-30 text-gray-900 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-white/50 cursor-pointer"
+                />
+              </div>
+
+              <button
+                type="submit"
+                class="w-full py-3 px-5 rounded-full font-bold text-white bg-[#0C2B58] hover:bg-indigo-950 cursor-pointer border-[#CCCFD1] border-1 transition-all mt-6"
+              >
+                CREATE BUDGET &rarr;
+              </button>
+            </form>
+
+            {% if active_budget %}
+            <p
+              class="font-sans text-sm text-yellow-200 mt-6 bg-yellow-500/20 p-2 rounded"
+            >
+              ⚠️ You already have an active budget. Creating a new one will
+              deactivate the old one.
+            </p>
+            {% endif %}
+          </div>
+        </main>
+
+        <footer
+          class="container mx-auto px-6 py-4 text-center text-gray-400 text-sm"
+        >
+          <p>© 2025 Dynamic Personal Budget Simulator | UET Peshawar</p>
+        </footer>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+    <script>
+      // 2. Initialize Flatpickr on the start_date input
+      flatpickr("#start_date", {
+        altInput: true,
+        altFormat: "F j, Y", // Displays as "December 13, 2025"
+        dateFormat: "Y-m-d", // Sends "2025-12-13" to Django
+        disableMobile: "true", // Forces the beautiful calendar even on mobile
+        theme: "dark",
+      });
+      const form = document.getElementById("budget-form");
+      const errorMessage = document.getElementById("error-message");
+      const budgetInput = document.getElementById("total_budget");
+      const dateInput = document.getElementById("start_date");
+
+      form.addEventListener("submit", function (event) {
+        const budgetVal = budgetInput.value.trim();
+        const dateVal = dateInput.value.trim();
+        let errorText = "";
+
+        // 1. Check empty fields
+        if (budgetVal === "" || dateVal === "") {
+          errorText = "Please fill in all fields.";
+        }
+        // 2. Check if budget is positive
+        else if (parseFloat(budgetVal) <= 0) {
+          errorText = "Total budget must be greater than 0.";
+        }
+
+        // If validation fails
+        if (errorText) {
+          event.preventDefault(); // Stop submission
+          errorMessage.classList.remove("hidden");
+          errorMessage.innerHTML = `
+            <div class="bg-red-500/10 p-2 rounded border border-red-500/50 mb-2">
+               ⚠️ ${errorText}
+            </div>
+          `;
+        }
+      });
+    </script>
+  </body>
+</html>

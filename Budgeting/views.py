@@ -657,6 +657,43 @@ def create_goal(request):
 
 @login_required(login_url='login')
 def update_goal_progress(request, goal_id):
+    """Update goal progress by ADDING money"""
+    goal = get_object_or_404(Goal, goalId=goal_id, user=request.user)
+    
+    if request.method == 'POST':
+        amount_to_add = request.POST.get('progress')
+        
+        try:
+            amount_to_add = Decimal(amount_to_add)
+            
+            # Check for negative numbers
+            if amount_to_add < 0:
+                messages.error(request, 'Cannot add negative amount')
+                return redirect('goals_list')
+
+            # Calculate what the NEW total would be
+            new_total = goal.current_progress + amount_to_add
+
+            # Validation: Don't let them save more than the target
+            if new_total > goal.target_amount:
+                messages.error(request, f'Cannot add {amount_to_add}. It exceeds the target! You only need {goal.target_amount - goal.current_progress} more.')
+            else:
+                # ✅ THIS IS THE FIX: We ADD to the existing amount
+                goal.current_progress = new_total
+                
+                # Check completion
+                if goal.current_progress >= goal.target_amount:
+                    goal.is_completed = True
+                    messages.success(request, f'🎉 Congratulations! Goal "{goal.title}" completed!')
+                else:
+                    goal.is_completed = False
+                    messages.success(request, f'Added {amount_to_add} to your savings!')
+                
+                goal.save()
+        except:
+            messages.error(request, 'Invalid amount')
+    
+    return redirect('goals_list')
     """Update goal progress"""
     goal = get_object_or_404(Goal, goalId=goal_id, user=request.user)
     

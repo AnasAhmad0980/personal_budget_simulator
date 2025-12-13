@@ -43,7 +43,7 @@
         </header>
 
         <div
-          class="flex justify-between min-h-screen mx-6 my-6 relative bg-white/30"
+          class="flex justify-between min-h-screen mx-6 my-6 relative"
         >
           <div
             class="bg-[#2A5172]/70 right-0.5 border-[#CCCFD1] border flex flex-col items-center justify-between rounded-2xl min-w-[200px]"
@@ -52,7 +52,7 @@
               class="text-white flex items-center px-4 py-3 flex-col space-y-7 m-5 font-serif w-full"
             >
               <a
-                class="px-4 py-2 mt-2 w-full text-center bg-white/50 rounded-3xl hover:bg-white/70"
+                class="px-4 py-2 mt-2 w-full text-center bg-[#0C2B58] rounded-3xl hover:bg-white/70"
                 href="{% url 'budgeting_dashboard' %}"
                 >Dashboard</a
               >
@@ -100,7 +100,7 @@
           </div>
 
           <div
-            class="bg-[#2A5172]/70 right-0.5 border-[#CCCFD1] border flex flex-col items-center justify-center rounded-2xl h-[700px] w-[700px] text-white font-serif"
+            class="bg-[#2A5172]/70 right-0.5 border-[#CCCFD1] border flex flex-col items-center justify-center rounded-2xl h-[700px] w-[800px] text-white font-serif"
           >
             {% if not active_budget %}
             <p>No active budget found.</p>

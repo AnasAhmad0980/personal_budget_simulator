@@ -1,0 +1,283 @@
+{% load static tailwind_tags %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DPBS - Calendar</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    {% tailwind_css %}
+
+    <style>
+      /* Custom scrollbar for the modal list */
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 6px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.1);
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 4px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.4);
+      }
+    </style>
+  </head>
+
+  <body class="font-sans bg-slate-900 text-gray-200">
+    <div class="relative min-h-screen flex flex-col">
+      <div
+        class="fixed inset-0 bg-cover bg-center z-0"
+        style="background-image: url('{% static 'images/Rectangle1.jpg' %}')"
+      ></div>
+
+      <header class="relative z-10 container mx-auto px-6 py-6">
+        <nav class="flex justify-between items-center px-4 md:px-5">
+          <a
+            href="{% url 'budgeting_dashboard' %}"
+            class="text-3xl font-bold text-white font-pacifico"
+            >DPBS</a
+          >
+
+          <div
+            class="h-12 w-12 bg-[#2A5172]/70 rounded-full hidden md:block cursor-pointer"
+          >
+            <img
+              class="object-cover h-full w-full rounded-full"
+              src="{% static 'images/profile-pic.jpg' %}"
+              alt="Profile"
+            />
+          </div>
+
+          <div class="md:hidden">
+            <a class="text-4xl text-white" href="#">&#8801;</a>
+          </div>
+        </nav>
+      </header>
+
+      <div
+        class="relative z-10 flex flex-col md:flex-row justify-between min-h-screen mx-4 md:mx-6 my-6 gap-6"
+      >
+        <div
+          class="bg-[#2A5172]/70 border-[#CCCFD1] border flex flex-col items-center rounded-2xl min-w-[200px] h-fit sticky top-6 backdrop-blur-md hidden md:flex"
+        >
+          <div
+            class="text-white flex items-center px-4 py-3 flex-col space-y-7 m-5 font-serif w-full"
+          >
+            <a
+              class="px-4 py-2 mt-2 w-full text-center bg-white/50 rounded-3xl hover:bg-white/70 transition-colors"
+              href="{% url 'budgeting_dashboard' %}"
+              >Dashboard</a
+            >
+            <a
+              class="px-4 py-2 mt-2 w-full text-center bg-white/50 rounded-3xl hover:bg-white/70 transition-colors"
+              href="{% url 'transactions_list' %}"
+              >Transactions</a
+            >
+            <a
+              class="px-4 py-2 mt-2 w-full text-center bg-white/50 rounded-3xl hover:bg-white/70 transition-colors"
+              href="{% url 'budget_setup' %}"
+              >Monthly Setup</a
+            >
+            <a
+              class="px-4 py-2 mt-2 w-full text-center bg-white/50 rounded-3xl hover:bg-white/70 transition-colors"
+              href="{% url 'add_transaction' %}"
+              >Add Transaction</a
+            >
+            <a
+              class="px-4 py-2 mt-2 w-full text-center bg-white/50 rounded-3xl hover:bg-white/70 transition-colors"
+              href="{% url 'goals_list' %}"
+              >Add Goal</a
+            >
+          </div>
+
+          <div
+            class="text-white flex items-center px-4 py-3 flex-col space-y-5 m-5 font-serif w-full border-t border-white/20 pt-6"
+          >
+            <a
+              class="w-full text-center px-4 py-2 mt-2 bg-[#0C2B58] text-white rounded-3xl shadow-lg transform scale-105 font-serif"
+              href="{% url 'calendar_dashboard' %}"
+              >View Calendar</a
+            >
+          </div>
+        </div>
+
+        <div
+          class="flex-grow bg-[#2A5172]/70 border-[#CCCFD1] border rounded-2xl p-6 md:p-8 backdrop-blur-lg shadow-2xl flex flex-col"
+        >
+          <div class="flex justify-between items-center mb-8">
+            <a
+              href="?month={{ prev_month }}&year={{ prev_year }}"
+              class="text-white hover:bg-white/20 p-3 rounded-full transition-colors border border-white/10"
+            >
+              <i class="fas fa-chevron-left text-xl"></i>
+            </a>
+
+            <h2
+              class="font-serif text-3xl font-bold text-white uppercase tracking-wider text-center"
+            >
+              {{ month_name }}
+              <span class="text-blue-300 ml-2">{{ year }}</span>
+            </h2>
+
+            <a
+              href="?month={{ next_month }}&year={{ next_year }}"
+              class="text-white hover:bg-white/20 p-3 rounded-full transition-colors border border-white/10"
+            >
+              <i class="fas fa-chevron-right text-xl"></i>
+            </a>
+          </div>
+
+          <div
+            class="grid grid-cols-7 text-center mb-4 border-b border-white/10 pb-4"
+          >
+            <div class="text-gray-300 font-bold text-sm uppercase">Mon</div>
+            <div class="text-gray-300 font-bold text-sm uppercase">Tue</div>
+            <div class="text-gray-300 font-bold text-sm uppercase">Wed</div>
+            <div class="text-gray-300 font-bold text-sm uppercase">Thu</div>
+            <div class="text-gray-300 font-bold text-sm uppercase">Fri</div>
+            <div class="text-gray-300 font-bold text-sm uppercase">Sat</div>
+            <div class="text-gray-300 font-bold text-sm uppercase text-red-300">
+              Sun
+            </div>
+          </div>
+
+          <div class="flex-grow grid grid-cols-7 grid-rows-5 gap-3">
+            {% for week in calendar %} {% for day in week %} {% if not day %}
+            <div class="bg-black/10 rounded-xl border border-transparent"></div>
+            {% else %}
+            <a
+              href="?year={{ year }}&month={{ month }}&day={{ day.day }}"
+              class="relative bg-white/10 rounded-xl p-2 border border-white/10 hover:bg-white/20 hover:border-white/30 hover:scale-105 transition-all cursor-pointer group flex flex-col items-center justify-between min-h-[80px] shadow-sm"
+            >
+              <span
+                class="text-white font-serif text-xl font-bold {% if day.day == selected_day %}text-blue-300{% endif %}"
+                >{{ day.day }}</span
+              >
+
+              <div class="flex gap-1.5 mb-1">
+                {% if day.income > 0 %}
+                <div
+                  class="h-2.5 w-2.5 rounded-full bg-green-400 shadow-[0_0_8px_rgba(74,222,128,0.8)] border border-black/20"
+                  title="Income: +{{ day.income }}"
+                ></div>
+                {% endif %} {% if day.expense > 0 %}
+                <div
+                  class="h-2.5 w-2.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)] border border-black/20"
+                  title="Expense: -{{ day.expense }}"
+                ></div>
+                {% endif %}
+              </div>
+            </a>
+            {% endif %} {% endfor %} {% endfor %}
+          </div>
+
+          <div
+            class="mt-8 flex justify-center gap-8 text-sm text-gray-400 font-serif"
+          >
+            <div class="flex items-center gap-2">
+              <div
+                class="h-3 w-3 rounded-full bg-green-400 shadow-[0_0_5px_rgba(74,222,128,0.8)]"
+              ></div>
+              <span>Income</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <div
+                class="h-3 w-3 rounded-full bg-red-500 shadow-[0_0_5px_rgba(239,68,68,0.8)]"
+              ></div>
+              <span>Expense</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer
+        class="relative z-10 container mx-auto px-6 py-4 text-center text-gray-400 text-sm"
+      >
+        <p>© 2025 Dynamic Personal Budget Simulator | UET Peshawar</p>
+      </footer>
+    </div>
+
+    {% if selected_day %}
+    <div
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in"
+    >
+      <div
+        class="bg-[#1e293b] border border-white/20 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col max-h-[80vh] transform transition-all scale-100"
+      >
+        <div
+          class="bg-[#0C2B58] p-5 flex justify-between items-center border-b border-white/10"
+        >
+          <div>
+            <h3 class="text-2xl font-bold text-white font-serif">
+              {{ month_name }} {{ selected_day }}, {{ year }}
+            </h3>
+            <p class="text-xs text-blue-200 uppercase tracking-widest mt-1">
+              Daily Breakdown
+            </p>
+          </div>
+          <a
+            href="?year={{ year }}&month={{ month }}"
+            class="text-gray-400 hover:text-white transition-colors p-2 hover:bg-white/10 rounded-full"
+          >
+            <i class="fas fa-times text-xl"></i>
+          </a>
+        </div>
+
+        <div
+          class="p-5 overflow-y-auto custom-scrollbar flex-grow space-y-3 bg-[#0f172a]"
+        >
+          {% if selected_transactions %} {% for t in selected_transactions %}
+          <div
+            class="flex justify-between items-center bg-white/5 p-4 rounded-xl border border-white/5 hover:bg-white/10 transition-colors group"
+          >
+            <div>
+              <p class="text-white font-bold text-lg">
+                {% if t.category %} {{ t.category.category_name }} {% else %}
+                Income Source {% endif %}
+              </p>
+              {% if t.note %}
+              <p class="text-xs text-gray-400 italic group-hover:text-gray-300">
+                {{ t.note }}
+              </p>
+              {% endif %}
+            </div>
+            <div class="text-right">
+              {% if t.transaction_type == 'income' %}
+              <span class="text-green-400 font-mono font-bold text-lg"
+                >+{{ t.amount }}</span
+              >
+              {% else %}
+              <span class="text-red-400 font-mono font-bold text-lg"
+                >-{{ t.amount }}</span
+              >
+              {% endif %}
+            </div>
+          </div>
+          {% endfor %} {% else %}
+          <div class="text-center py-10 text-gray-500">
+            <i class="fas fa-ghost text-4xl mb-3 opacity-30"></i>
+            <p>No transactions on this date.</p>
+          </div>
+          {% endif %}
+        </div>
+
+        <div class="p-4 border-t border-white/10 bg-[#1e293b] text-center">
+          <a
+            href="{% url 'add_transaction' %}"
+            class="inline-block w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition-colors shadow-lg"
+          >
+            <i class="fas fa-plus mr-2"></i> Add Transaction Here
+          </a>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </body>
+</html>

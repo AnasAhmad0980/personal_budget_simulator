@@ -42,9 +42,7 @@
           </nav>
         </header>
 
-        <div
-          class="flex justify-between min-h-screen mx-6 my-6 relative"
-        >
+        <div class="flex justify-between min-h-screen mx-6 my-6 relative">
           <div
             class="bg-[#2A5172]/70 right-0.5 border-[#CCCFD1] border flex flex-col items-center justify-between rounded-2xl min-w-[200px]"
           >
@@ -100,21 +98,57 @@
           </div>
 
           <div
-            class="bg-[#2A5172]/70 right-0.5 border-[#CCCFD1] border flex flex-col items-center justify-center rounded-2xl h-[700px] w-[800px] text-white font-serif"
+            class="bg-[#2A5172]/70 right-0.5 border-[#CCCFD1] border flex flex-col rounded-2xl h-[700px] w-[800px] p-8 overflow-hidden backdrop-blur-lg shadow-2xl"
           >
-            {% if not active_budget %}
-            <p>No active budget found.</p>
-            <a href="{% url 'budget_setup' %}" class="underline text-blue-300"
-              >Create one now</a
-            >
-            {% else %}
-            <p class="text-2xl opacity-50">Calendar / Overview</p>
-            <p class="text-sm opacity-50">
-              Select "View Calendar" in sidebar for details
-            </p>
-            {% endif %}
-          </div>
+            <div class="flex justify-between items-center mb-6">
+              <h2
+                class="font-serif text-3xl font-bold text-white uppercase tracking-wider"
+              >
+                {{ month_name }}
+                <span class="text-blue-300">{{ current_year }}</span>
+              </h2>
+              <a
+                href="{% url 'calendar_dashboard' %}"
+                class="text-sm text-gray-300 hover:text-white border-b border-gray-400 transition-colors"
+                >View Details -></a
+              >
+            </div>
 
+            <div class="grid grid-cols-7 text-center mb-4">
+              <div class="text-gray-400 font-bold text-sm uppercase">M</div>
+              <div class="text-gray-400 font-bold text-sm uppercase">T</div>
+              <div class="text-gray-400 font-bold text-sm uppercase">W</div>
+              <div class="text-gray-400 font-bold text-sm uppercase">T</div>
+              <div class="text-gray-400 font-bold text-sm uppercase">F</div>
+              <div class="text-gray-400 font-bold text-sm uppercase">S</div>
+              <div class="text-gray-400 font-bold text-sm uppercase">S</div>
+            </div>
+
+            <div class="flex-grow grid grid-cols-7 grid-rows-5 gap-3">
+              {% for week in calendar %} {% for day in week %} {% if not day %}
+              <div class="bg-black/10 rounded-xl"></div>
+              {% else %}
+              <a
+                href="{% url 'calendar_dashboard' %}?year={{ current_year }}&month={{ current_month }}&day={{ day.day }}"
+                class="relative bg-white/10 rounded-xl p-2 border border-white/10 hover:bg-white/20 hover:scale-105 transition-all cursor-pointer group flex flex-col items-center justify-between shadow-lg"
+              >
+                <span class="text-white font-serif text-xl font-bold"
+                  >{{ day.day }}</span
+                >
+
+                <div class="flex gap-1 mb-1">
+                  {% if day.income > 0 %}
+                  <div
+                    class="h-2 w-2 rounded-full bg-green-400 shadow-lg"
+                  ></div>
+                  {% endif %} {% if day.expense > 0 %}
+                  <div class="h-2 w-2 rounded-full bg-red-500 shadow-lg"></div>
+                  {% endif %}
+                </div>
+              </a>
+              {% endif %} {% endfor %} {% endfor %}
+            </div>
+          </div>
           <div
             class="bg-[#2A5172]/70 right-0.5 border-[#CCCFD1] border flex flex-col items-center justify-start space-y-6 rounded-2xl min-w-[340px]"
           >
@@ -165,9 +199,10 @@
               {% endif %}
             </div>
 
-            {% comment %} <div
-              class="bg-white/20 w-2xs h-2xs mx-6 my-6 flex flex-col space-y-2 px-6 py-6 rounded-2xl border-[#CCCFD1] border w-[90%]">
-            
+            {% comment %}
+            <div
+              class="bg-white/20 w-2xs h-2xs mx-6 my-6 flex flex-col space-y-2 px-6 py-6 rounded-2xl border-[#CCCFD1] border w-[90%]"
+            >
               <div class="text-2xl font-semibold font-serif text-white">
                 Category Snapshot
               </div>
@@ -230,7 +265,8 @@
                 Add transactions to see breakdown.
               </p>
               {% endif %}
-            </div> {% endcomment %}
+            </div>
+            {% endcomment %}
           </div>
         </div>
 

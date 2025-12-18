@@ -166,12 +166,26 @@ wheels = [
 ]
 
 [[package]]
+name = "django-tailwind"
+version = "4.4.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "django" },
+    { name = "pytailwindcss" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/ca/21/86fda52a8d0f8d2f31d32982ee4d9cc4f29c868dbeb52412e430d083d126/django_tailwind-4.4.2.tar.gz", hash = "sha256:b3a3eb2d22cbb8c17565898fb68ccedcf806542b04fe4107bdfec7035d582819", size = 13965, upload-time = "2025-12-05T18:23:41.028Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/02/ed/85113d22ab4268600542152bc4b5512abb1204552b90e04848ebc496aa5c/django_tailwind-4.4.2-py3-none-any.whl", hash = "sha256:0e4a2836cb36e8952700457d049fadb8743583017cef80fa3a374f8597c289f4", size = 23358, upload-time = "2025-12-05T18:23:39.462Z" },
+]
+
+[[package]]
 name = "dynamic-personal-budget-simulator"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "cookiecutter" },
     { name = "django" },
+    { name = "django-tailwind" },
     { name = "python-dotenv" },
 ]
 
@@ -179,6 +193,7 @@ dependencies = [
 requires-dist = [
     { name = "cookiecutter", specifier = ">=2.6.0" },
     { name = "django", specifier = ">=5.2.8" },
+    { name = "django-tailwind", specifier = ">=4.4.2" },
     { name = "python-dotenv", specifier = ">=1.2.1" },
 ]
 
@@ -294,6 +309,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/b0/77/a5b8c569bf593b0140bde72ea885a803b82086995367bf2037de0159d924/pygments-2.19.2.tar.gz", hash = "sha256:636cb2477cec7f8952536970bc533bc43743542f70392ae026374600add5b887", size = 4968631, upload-time = "2025-06-21T13:39:12.283Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/c7/21/705964c7812476f378728bdf590ca4b771ec72385c533964653c68e86bdc/pygments-2.19.2-py3-none-any.whl", hash = "sha256:86540386c03d588bb81d44bc3928634ff26449851e99741617ecb9037ee5ec0b", size = 1225217, upload-time = "2025-06-21T13:39:07.939Z" },
+]
+
+[[package]]
+name = "pytailwindcss"
+version = "0.3.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/d7/90/b83df1eae67f3f22c59ca3f6df67d7a2591bb27157f04a173bd1f164d3e0/pytailwindcss-0.3.0.tar.gz", hash = "sha256:1f71dd64020aacb40608dfe8725ca441c772016c344f757ccbc74b8b6143027d", size = 5527, upload-time = "2025-10-29T19:13:42.155Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ca/59/e7b86790c4558cfa0344c424219fe17d371b70273044b9a2d163ce1d3f44/pytailwindcss-0.3.0-py3-none-any.whl", hash = "sha256:a9b770ad3c0a0f40073052bcfe81a060b550fed38af614a472f5aa7bb85fa8aa", size = 7502, upload-time = "2025-10-29T19:13:41.109Z" },
 ]
 
 [[package]]

@@ -36,14 +36,19 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # Tailwind MUST come before your apps
+    'tailwind',
+    'theme',
+
+    # Project apps
     'UserAuth',
     'Budgeting',
-    "tailwind",
-    "theme",
 ]
+
 ## Tailwind Config ##
 TAILWIND_APP_NAME = "theme"
-NPM_BIN_PATH = "npm.cmd"
+NPM_BIN_PATH = "npm"
 
 
 MIDDLEWARE = [

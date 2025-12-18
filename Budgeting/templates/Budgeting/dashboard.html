@@ -1,0 +1,281 @@
+{% load static tailwind_tags %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DPBS - Dashboard</title>
+    {% tailwind_css %}
+  </head>
+
+  <body class="font-sans bg-slate-900">
+    <div class="relative min-h-screen">
+      <div
+        class="absolute inset-0 bg-cover bg-center"
+        style="background-image: url('{% static 'images/Rectangle1.jpg' %}')"
+      ></div>
+
+      <div class="relative z-10 flex flex-col min-h-screen text-gray-200">
+        <header class="container mx-auto px-6 py-6">
+          <nav class="flex justify-between items-center px-4 md:px-5">
+            <a
+              href="{% url 'budgeting_dashboard' %}"
+              class="text-3xl font-bold text-white font-pacifico"
+            >
+              DPBS
+            </a>
+
+            <div
+              class="h-12 w-12 bg-[#2A5172]/70 rounded-full hidden md:block cursor-pointer"
+            >
+              <img
+                class="object-cover h-full w-full rounded-full"
+                src="{% static 'images/profile-pic.jpg' %}"
+                alt="Profile"
+              />
+            </div>
+
+            <div class="md:hidden">
+              <a class="text-4xl text-white" href="#">&#8801;</a>
+            </div>
+          </nav>
+        </header>
+
+        <div class="flex justify-between min-h-screen mx-6 my-6 relative">
+          <div
+            class="bg-[#2A5172]/70 right-0.5 border-[#CCCFD1] border flex flex-col items-center justify-between rounded-2xl min-w-[200px]"
+          >
+            <div
+              class="text-white flex items-center px-4 py-3 flex-col space-y-7 m-5 font-serif w-full"
+            >
+              <a
+                class="px-4 py-2 mt-2 w-full text-center bg-[#0C2B58] rounded-3xl hover:bg-white/70"
+                href="{% url 'budgeting_dashboard' %}"
+                >Dashboard</a
+              >
+              <a
+                class="px-4 py-2 mt-2 w-full text-center bg-white/50 rounded-3xl hover:bg-white/70"
+                href="{% url 'transactions_list' %}"
+                >Transactions</a
+              >
+              <a
+                class="px-4 py-2 mt-2 w-full text-center bg-white/50 rounded-3xl hover:bg-white/70"
+                href="{% url 'budget_setup' %}"
+                >Monthly Setup</a
+              >
+              <a
+                class="px-4 py-2 mt-2 w-full text-center bg-white/50 rounded-3xl hover:bg-white/70"
+                href="{% url 'add_transaction' %}"
+                >Add Transaction</a
+              >
+              <a
+                class="px-4 py-2 mt-2 w-full text-center bg-white/50 rounded-3xl hover:bg-white/70"
+                href="{% url 'goals_list' %}"
+                >Add Goal</a
+              >
+            </div>
+
+            <div
+              class="text-white flex items-center px-4 py-3 flex-col space-y-5 m-5 font-serif w-full"
+            >
+              <a
+                class="text-red-500 flex items-center"
+                href="{% url 'transactions_list' %}?type=expense"
+                ><span class="text-4xl px-0.5">&#8901; </span>expense</a
+              >
+              <a
+                class="text-green-500 flex items-center"
+                href="{% url 'transactions_list' %}?type=income"
+                ><span class="text-4xl px-0.5">&#8901; </span>income</a
+              >
+              <a
+                class="w-full text-center px-4 py-2 mt-2 bg-white/50 rounded-3xl font-serif hover:bg-white/70"
+                href="{% url 'calendar_dashboard' %}"
+                >View Calendar</a
+              >
+            </div>
+          </div>
+
+          <div
+            class="bg-[#2A5172]/70 right-0.5 border-[#CCCFD1] border flex flex-col rounded-2xl h-[700px] w-[800px] p-8 overflow-hidden backdrop-blur-lg shadow-2xl"
+          >
+            <div class="flex justify-between items-center mb-6">
+              <h2
+                class="font-serif text-3xl font-bold text-white uppercase tracking-wider"
+              >
+                {{ month_name }}
+                <span class="text-blue-300">{{ current_year }}</span>
+              </h2>
+              <a
+                href="{% url 'calendar_dashboard' %}"
+                class="text-sm text-gray-300 hover:text-white border-b border-gray-400 transition-colors"
+                >View Details -></a
+              >
+            </div>
+
+            <div class="grid grid-cols-7 text-center mb-4">
+              <div class="text-gray-400 font-bold text-sm uppercase">M</div>
+              <div class="text-gray-400 font-bold text-sm uppercase">T</div>
+              <div class="text-gray-400 font-bold text-sm uppercase">W</div>
+              <div class="text-gray-400 font-bold text-sm uppercase">T</div>
+              <div class="text-gray-400 font-bold text-sm uppercase">F</div>
+              <div class="text-gray-400 font-bold text-sm uppercase">S</div>
+              <div class="text-gray-400 font-bold text-sm uppercase">S</div>
+            </div>
+
+            <div class="flex-grow grid grid-cols-7 grid-rows-5 gap-3">
+              {% for week in calendar %} {% for day in week %} {% if not day %}
+              <div class="bg-black/10 rounded-xl"></div>
+              {% else %}
+              <a
+                href="{% url 'calendar_dashboard' %}?year={{ current_year }}&month={{ current_month }}&day={{ day.day }}"
+                class="relative bg-white/10 rounded-xl p-2 border border-white/10 hover:bg-white/20 hover:scale-105 transition-all cursor-pointer group flex flex-col items-center justify-between shadow-lg"
+              >
+                <span class="text-white font-serif text-xl font-bold"
+                  >{{ day.day }}</span
+                >
+
+                <div class="flex gap-1 mb-1">
+                  {% if day.income > 0 %}
+                  <div
+                    class="h-2 w-2 rounded-full bg-green-400 shadow-lg"
+                  ></div>
+                  {% endif %} {% if day.expense > 0 %}
+                  <div class="h-2 w-2 rounded-full bg-red-500 shadow-lg"></div>
+                  {% endif %}
+                </div>
+              </a>
+              {% endif %} {% endfor %} {% endfor %}
+            </div>
+          </div>
+          <div
+            class="bg-[#2A5172]/70 right-0.5 border-[#CCCFD1] border flex flex-col items-center justify-start space-y-6 rounded-2xl min-w-[340px]"
+          >
+            <div
+              class="bg-white/20 w-2xs h-2xs mx-6 my-6 flex flex-col space-y-2 px-6 py-6 rounded-2xl border-[#CCCFD1] border w-[90%]"
+            >
+              <div class="text-2xl font-semibold font-serif text-white">
+                This month
+              </div>
+              <div class="flex justify-between text-white font-serif">
+                <p>Budget</p>
+                <p>{{ total_budget|default:"0" }}</p>
+              </div>
+              <div class="flex justify-between text-white font-serif">
+                <p>Spent</p>
+                <p>{{ total_spent|default:"0" }}</p>
+              </div>
+              <div class="flex justify-between text-white font-serif">
+                <p>Remaining</p>
+                <p
+                  class="{% if remaining_balance < 0 %}text-red-300{% endif %}"
+                >
+                  {{ remaining_balance|default:"0" }}
+                </p>
+              </div>
+            </div>
+
+            <div
+              class="bg-white/20 w-2xs h-2xs mx-6 my-6 flex flex-col space-y-2 px-6 py-6 rounded-2xl border-[#CCCFD1] border w-[90%] overflow-y-auto max-h-[200px]"
+            >
+              <div class="text-2xl font-semibold font-serif text-white mb-2">
+                Goals
+              </div>
+
+              {% if goals %} {% for goal in goals %}
+              <div class="flex justify-between text-white font-serif text-sm">
+                <p>{{ goal.title }}</p>
+                <p>{{ goal.target_amount }}</p>
+              </div>
+              <div class="h-1.5 w-full rounded-full bg-gray-400/30 mb-2">
+                <div
+                  class="h-full rounded-full bg-white"
+                  style="width: {% widthratio goal.current_progress goal.target_amount 100 %}%"
+                ></div>
+              </div>
+              {% endfor %} {% else %}
+              <p class="text-white/50 text-sm">No active goals.</p>
+              {% endif %}
+            </div>
+
+            {% comment %}
+            <div
+              class="bg-white/20 w-2xs h-2xs mx-6 my-6 flex flex-col space-y-2 px-6 py-6 rounded-2xl border-[#CCCFD1] border w-[90%]"
+            >
+              <div class="text-2xl font-semibold font-serif text-white">
+                Category Snapshot
+              </div>
+
+              {% if categories_summary %}
+              <div class="flex justify-between text-white font-serif mt-2">
+                <div class="flex items-center space-x-5">
+                  <div
+                    class="relative flex h-25 w-25 items-center justify-center rounded-full border-[1.5px] border-blue-100 min-w-[100px] min-h-[100px]"
+                  >
+                    <div class="absolute h-full w-full rotate-0">
+                      <div
+                        class="mx-auto h-[50%] w-[1.5px] bg-blue-100 origin-bottom"
+                      ></div>
+                    </div>
+                    <div class="absolute h-full w-full rotate-[120deg]">
+                      <div
+                        class="mx-auto h-[50%] w-[1.5px] bg-blue-100 origin-bottom"
+                      ></div>
+                    </div>
+                    <div class="absolute h-full w-full rotate-[240deg]">
+                      <div
+                        class="mx-auto h-[50%] w-[1.5px] bg-blue-100 origin-bottom"
+                      ></div>
+                    </div>
+
+                    <span
+                      class="absolute left-7 top-7 text-sm font-serif text-blue-100"
+                      >a</span
+                    >
+                    <span
+                      class="absolute right-5 top-12 text-sm font-serif text-blue-100"
+                      >b</span
+                    >
+                    <span
+                      class="absolute bottom-5 left-10 text-sm font-serif text-blue-100"
+                      >c</span
+                    >
+                  </div>
+
+                  <div
+                    class="flex flex-col space-y-2 font-serif text-[15px] leading-relaxed text-blue-50"
+                  >
+                    {% for cat in categories_summary|slice:":3" %}
+                    <div class="flex gap-2">
+                      <span class="font-bold text-blue-200">
+                        {% cycle 'a' 'b' 'c' %}
+                      </span>
+                      <span>-</span>
+                      <span class="truncate max-w-[100px]">{{ cat.name }}</span>
+                    </div>
+                    {% endfor %}{% if categories_summary|length == 0 %}
+                    <span class="text-sm opacity-50">No data yet</span>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+              {% else %}
+              <p class="text-white/50 text-sm mt-2">
+                Add transactions to see breakdown.
+              </p>
+              {% endif %}
+            </div>
+            {% endcomment %}
+          </div>
+        </div>
+
+        <footer
+          class="container mx-auto px-6 py-4 text-center text-gray-400 text-sm"
+        >
+          <p>© 2025 Dynamic Personal Budget Simulator | UET Peshawar</p>
+        </footer>
+      </div>
+    </div>
+  </body>
+</html>

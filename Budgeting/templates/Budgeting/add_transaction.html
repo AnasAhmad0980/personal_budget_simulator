@@ -1,0 +1,156 @@
+{% load static tailwind_tags %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DPBS - Add Transaction</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://npmcdn.com/flatpickr/dist/themes/dark.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* Flatpickr Custom Override to match your Theme */
+        .flatpickr-calendar { background: #1e293b !important; border: 1px solid rgba(255,255,255,0.2) !important; }
+        .flatpickr-months .flatpickr-month { background: #0C2B58 !important; fill: #fff !important; color: #fff !important; }
+        .flatpickr-day.selected { background: #2A5172 !important; border-color: #2A5172 !important; }
+    </style>
+    {% tailwind_css %}
+  </head>
+
+  <body class="font-sans bg-slate-900 text-gray-200">
+    <div class="relative min-h-screen flex flex-col">
+      <div class="fixed inset-0 bg-cover bg-center z-0" style="background-image: url('{% static 'images/Rectangle1.jpg' %}')"></div>
+
+      <header class="relative z-10 container mx-auto px-6 py-6">
+        <nav class="flex justify-between items-center px-4 md:px-5">
+          <a href="{% url 'budgeting_dashboard' %}" class="text-3xl font-bold text-white font-pacifico">DPBS</a>
+          
+          <ul class="md:flex items-center space-x-8 text-gray-300 font-crimson text-lg hidden">
+             <li><a href="{% url 'budgeting_dashboard' %}" class="hover:text-white transition-colors">Dashboard</a></li>
+             <li><a href="{% url 'logout' %}" class="hover:text-white transition-colors">Logout</a></li>
+          </ul>
+          
+          <div class="md:hidden"><a class="text-4xl text-white" href="#">&#8801;</a></div>
+        </nav>
+      </header>
+
+      <main class="relative z-10 flex-grow container mx-auto px-4 pb-12 flex flex-col items-center justify-center">
+        
+        <div class="w-full max-w-lg p-8 rounded-2xl shadow-2xl bg-[#2A5172]/70 bg-opacity-40 border border-white border-opacity-20 backdrop-blur-lg">
+            
+            <h2 class="font-serif text-3xl font-bold text-white mb-6 text-center">Add Transaction</h2>
+
+            {% if messages %}
+                {% for message in messages %}
+                <div class="mb-4 p-3 rounded border bg-[#2A5172]/90 border-white/30 text-white shadow-lg backdrop-blur-md">
+                   {{ message }}
+                </div>
+                {% endfor %}
+            {% endif %}
+
+            <form method="POST" action="{% url 'add_transaction' %}" class="space-y-6">
+                {% csrf_token %}
+
+                <div class="flex justify-center mb-6">
+                    <div class="relative flex bg-slate-900/50 rounded-full p-1 border border-white/20">
+                        <input type="radio" name="transaction_type" id="type_expense" value="expense" class="peer/expense hidden" checked>
+                        <input type="radio" name="transaction_type" id="type_income" value="income" class="peer/income hidden">
+                        
+                        <label for="type_expense" class="cursor-pointer px-6 py-2 rounded-full text-gray-400 peer-checked/expense:bg-red-500 peer-checked/expense:text-white transition-all">
+                            Expense
+                        </label>
+                        <label for="type_income" class="cursor-pointer px-6 py-2 rounded-full text-gray-400 peer-checked/income:bg-green-500 peer-checked/income:text-white transition-all">
+                            Income
+                        </label>
+                    </div>
+                </div>
+
+                <div class="text-left">
+                    <label class="text-gray-300 text-sm ml-4 mb-1 block">Amount</label>
+                    <input type="number" step="1" name="amount" placeholder="0.00" required
+                        class="w-full py-3 px-5 rounded-full bg-white bg-opacity-10 border border-white border-opacity-30 text-gray-900 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-white/50 font-mono text-lg">
+                </div>
+
+                <div class="text-left" id="category-container">
+                    <label class="text-gray-300 text-sm ml-4 mb-1 block">Category</label>
+                    <div class="relative">
+                        <select name="category" class="w-full py-3 pl-5 pr-10 rounded-full bg-white bg-opacity-10 border border-white border-opacity-30 text-gray-900 focus:outline-none focus:ring-2 focus:ring-white/50 cursor-pointer appearance-none">
+                            <option value="" disabled selected>Select Category...</option>
+                            {% for cat in categories %}
+                                <option value="{{ cat.categoryId }}" class="text-black">{{ cat.category_name }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-800">
+                            <svg class="h-4 w-4 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-left">
+                    <label class="text-gray-300 text-sm ml-4 mb-1 block">Date</label>
+                    <input type="text" id="transaction_date" name="date" value="{{ today|date:'Y-m-d' }}"
+                        class="w-full py-3 px-5 rounded-full bg-white bg-opacity-10 border border-white border-opacity-30 text-gray-900 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-white/50 cursor-pointer">
+                </div>
+
+                <div class="text-left">
+                    <label class="text-gray-300 text-sm ml-4 mb-1 block">Note (Optional)</label>
+                    <input type="text" name="note" placeholder="What was this for?"
+                        class="w-full py-3 px-5 rounded-full bg-white bg-opacity-10 border border-white border-opacity-30 text-gray-900 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-white/50">
+                </div>
+
+                <button type="submit" class="w-full py-3 px-5 rounded-full font-bold text-white bg-[#0C2B58] hover:bg-indigo-950 cursor-pointer border-[#CCCFD1] border-1 shadow-lg mt-4">
+                    SAVE TRANSACTION
+                </button>
+
+            </form>
+        </div>
+
+      </main>
+
+      <footer class="relative z-10 container mx-auto px-6 py-4 text-center text-gray-400 text-sm">
+        <p>© 2025 Dynamic Personal Budget Simulator | UET Peshawar</p>
+      </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+        // 1. Initialize Date Picker
+        flatpickr("#transaction_date", {
+            altInput: true,
+            altFormat: "F j, Y",
+            dateFormat: "Y-m-d",
+            theme: "dark",
+            defaultDate: "today"
+        });
+
+        // 2. Toggle Category Dropdown based on Type
+        const expenseRadio = document.getElementById('type_expense');
+        const incomeRadio = document.getElementById('type_income');
+        const categoryContainer = document.getElementById('category-container');
+        const categorySelect = categoryContainer.querySelector('select');
+
+        function toggleCategory() {
+            if (incomeRadio.checked) {
+                // Hide category for income
+                categoryContainer.style.opacity = '0.5';
+                categoryContainer.style.pointerEvents = 'none';
+                categorySelect.required = false;
+                categorySelect.value = ""; // Reset selection
+            } else {
+                // Show category for expense
+                categoryContainer.style.opacity = '1';
+                categoryContainer.style.pointerEvents = 'auto';
+                categorySelect.required = true;
+            }
+        }
+
+        expenseRadio.addEventListener('change', toggleCategory);
+        incomeRadio.addEventListener('change', toggleCategory);
+        
+        // Run on load to set initial state
+        toggleCategory();
+    </script>
+  </body>
+</html>

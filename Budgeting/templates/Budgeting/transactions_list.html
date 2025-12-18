@@ -1,0 +1,196 @@
+{% load static tailwind_tags %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DPBS - Transactions</title>
+    {% tailwind_css %}
+  </head>
+
+  <body class="font-sans bg-slate-900 text-gray-200">
+    <div class="relative min-h-screen flex flex-col">
+      <div
+        class="fixed inset-0 bg-cover bg-center z-0"
+        style="background-image: url('{% static 'images/Rectangle1.jpg' %}')"
+      ></div>
+
+      <header class="relative z-10 container mx-auto px-6 py-6">
+        <nav class="flex justify-between items-center px-4 md:px-5">
+          <a href="{% url 'budgeting_dashboard' %}" class="text-3xl font-bold text-white font-pacifico">
+            DPBS
+          </a>
+
+          <div class="h-12 w-12 bg-[#2A5172]/70 rounded-full hidden md:block cursor-pointer">
+            <img
+              class="object-cover h-full w-full rounded-full"
+              src="{% static 'images/profile-pic.jpg' %}"
+              alt="Profile"
+            />
+          </div>
+
+          <div class="md:hidden">
+            <a class="text-4xl text-white" href="#">&#8801;</a>
+          </div>
+        </nav>
+      </header>
+
+      <div class="relative z-10 flex flex-col md:flex-row justify-between min-h-screen mx-4 md:mx-6 my-6 gap-6">
+        
+        <div class="bg-[#2A5172]/70 border-[#CCCFD1] border flex flex-col items-center rounded-2xl min-w-[200px] h-fit sticky top-6 backdrop-blur-md hidden md:flex">
+          <div class="text-white flex items-center px-4 py-3 flex-col space-y-7 m-5 font-serif w-full">
+            <a class="px-4 py-2 mt-2 w-full text-center bg-white/50 rounded-3xl hover:bg-white/70 transition-colors" href="{% url 'budgeting_dashboard' %}">Dashboard</a>
+            <a class="px-4 py-2 mt-2 w-full text-center bg-[#0C2B58] text-white rounded-3xl shadow-lg transform scale-105" href="{% url 'transactions_list' %}">Transactions</a>
+            <a class="px-4 py-2 mt-2 w-full text-center bg-white/50 rounded-3xl hover:bg-white/70 transition-colors" href="{% url 'budget_setup' %}">Monthly Setup</a>
+            <a class="px-4 py-2 mt-2 w-full text-center bg-white/50 rounded-3xl hover:bg-white/70 transition-colors" href="{% url 'add_transaction' %}">Add Transaction</a>
+            <a class="px-4 py-2 mt-2 w-full text-center bg-white/50 rounded-3xl hover:bg-white/70 transition-colors" href="{% url 'goals_list' %}">Add Goal</a>
+          </div>
+          
+          <div class="text-white flex items-center px-4 py-3 flex-col space-y-5 m-5 font-serif w-full border-t border-white/20 pt-6">
+             <a class="w-full text-center px-4 py-2 mt-2 bg-white/50 rounded-3xl font-serif hover:bg-white/70 transition-colors" href="{% url 'calendar_dashboard' %}">View Calendar</a>
+          </div>
+        </div>
+
+        <div class="flex-grow bg-[#2A5172]/70 border-[#CCCFD1] border rounded-2xl p-6 md:p-8 backdrop-blur-lg shadow-2xl flex flex-col">
+            
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+                <h2 class="font-serif text-3xl font-bold text-white">History</h2>
+                
+                <form method="GET" action="{% url 'transactions_list' %}" class="flex flex-wrap gap-3 items-center" id="filter-form">
+                    
+                    <div class="flex bg-black/20 rounded-full p-1 border border-white/10">
+                        <a href="{% url 'transactions_list' %}" 
+                           class="px-4 py-1.5 rounded-full text-sm transition-all {% if not filter_type %}bg-white text-[#0C2B58] font-bold shadow-sm{% else %}text-gray-300 hover:text-white{% endif %}">
+                           All
+                        </a>
+                        <a href="?type=income{% if filter_category %}&category={{ filter_category }}{% endif %}" 
+                           class="px-4 py-1.5 rounded-full text-sm transition-all {% if filter_type == 'income' %}bg-green-500 text-white font-bold shadow-sm{% else %}text-gray-300 hover:text-green-300{% endif %}">
+                           Income
+                        </a>
+                        <a href="?type=expense{% if filter_category %}&category={{ filter_category }}{% endif %}" 
+                           class="px-4 py-1.5 rounded-full text-sm transition-all {% if filter_type == 'expense' %}bg-red-500 text-white font-bold shadow-sm{% else %}text-gray-300 hover:text-red-300{% endif %}">
+                           Expense
+                        </a>
+                    </div>
+
+                    <div class="relative">
+                        <select name="category" onchange="this.form.submit()" 
+                                class="pl-4 pr-10 py-1.5 rounded-full bg-white/10 border border-white/20 text-white text-sm focus:outline-none focus:ring-1 focus:ring-white/50 appearance-none cursor-pointer hover:bg-white/20 transition-colors">
+                            <option value="">All Categories</option>
+                            {% for cat in categories %}
+                                <option value="{{ cat.categoryId }}" class="text-black" {% if filter_category == cat.categoryId|stringformat:"s" %}selected{% endif %}>
+                                    {{ cat.category_name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-white">
+                            <svg class="h-3 w-3 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                        </div>
+                        {% if filter_type %}
+                        <input type="hidden" name="type" value="{{ filter_type }}">
+                        {% endif %}
+                    </div>
+
+                </form>
+            </div>
+
+            {% if messages %}
+                {% for message in messages %}
+                <div class="mb-6 p-3 rounded border {% if message.tags == 'error' %}bg-red-500/20 border-red-500{% else %}bg-green-500/20 border-green-500{% endif %} text-white backdrop-blur-md">
+                   {{ message }}
+                </div>
+                {% endfor %}
+            {% endif %}
+
+            <div class="overflow-hidden rounded-xl border border-white/10 bg-black/10 flex-grow">
+                <div class="overflow-y-auto max-h-[600px] custom-scrollbar">
+                    
+                    {% if transactions %}
+                        <table class="w-full text-left border-collapse">
+                            <thead class="bg-white/5 text-gray-300 text-xs uppercase sticky top-0 backdrop-blur-md z-10">
+                                <tr>
+                                    <th class="py-4 px-6 font-semibold">Date</th>
+                                    <th class="py-4 px-6 font-semibold">Category / Note</th>
+                                    <th class="py-4 px-6 font-semibold text-right">Amount</th>
+                                    <th class="py-4 px-6 font-semibold text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-white/10">
+                                {% for t in transactions %}
+                                <tr class="hover:bg-white/5 transition-colors group">
+                                    
+                                    <td class="py-4 px-6 whitespace-nowrap text-gray-300 font-mono text-sm">
+                                        {{ t.date|date:"M d, Y" }}
+                                    </td>
+
+                                    <td class="py-4 px-6">
+                                        <div class="flex flex-col">
+                                            <span class="font-bold text-white text-lg">
+                                                {% if t.category %}
+                                                    {{ t.category.category_name }}
+                                                {% else %}
+                                                    Income
+                                                {% endif %}
+                                            </span>
+                                            {% if t.note %}
+                                            <span class="text-xs text-gray-400 italic truncate max-w-[200px]">{{ t.note }}</span>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+
+                                    <td class="py-4 px-6 text-right font-mono text-lg font-bold whitespace-nowrap">
+                                        {% if t.transaction_type == 'income' %}
+                                            <span class="text-green-400">+ {{ t.amount }}</span>
+                                        {% else %}
+                                            <span class="text-red-400">- {{ t.amount }}</span>
+                                        {% endif %}
+                                    </td>
+
+                                    <td class="py-4 px-6 text-center">
+                                        <div class="flex justify-center space-x-4 opacity-70 group-hover:opacity-100 transition-opacity">
+                                            <a href="{% url 'edit_transaction' t.transactionId %}" class="text-blue-300 hover:text-white transition-transform hover:scale-110" title="Edit">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                            </a>
+                                            <a href="{% url 'delete_transaction' t.transactionId %}" class="text-red-400 hover:text-red-200 transition-transform hover:scale-110" title="Delete">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <div class="flex flex-col items-center justify-center h-[400px] text-gray-400">
+                            <div class="bg-white/5 p-6 rounded-full mb-4">
+                                <svg class="w-16 h-16 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                            </div>
+                            <p class="text-xl font-serif text-gray-300">No transactions found</p>
+                            <p class="text-sm mb-6">Start tracking your spending today.</p>
+                            <a href="{% url 'add_transaction' %}" class="px-6 py-2 bg-[#0C2B58] text-white rounded-full hover:bg-indigo-900 transition shadow-lg border border-white/20">
+                                Add First Transaction
+                            </a>
+                        </div>
+                    {% endif %}
+
+                </div>
+            </div>
+
+        </div>
+
+      </div>
+
+      <footer class="relative z-10 container mx-auto px-6 py-4 text-center text-gray-400 text-sm">
+        <p>© 2025 Dynamic Personal Budget Simulator | UET Peshawar</p>
+      </footer>
+    </div>
+
+    <style>
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.4); }
+    </style>
+  </body>
+</html>

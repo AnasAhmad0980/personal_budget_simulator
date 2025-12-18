@@ -1,0 +1,320 @@
+{% load static tailwind_tags %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DPBS - Category Setup</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    {% tailwind_css %}
+  </head>
+
+  <body class="font-sans bg-slate-900 text-gray-200">
+    <div class="relative min-h-screen flex flex-col">
+      <div
+        class="fixed inset-0 bg-cover bg-center z-0"
+        style="background-image: url('{% static 'images/Rectangle1.jpg' %}')"
+      ></div>
+
+      <header class="relative z-10 container mx-auto px-6 py-6">
+        <nav class="flex justify-between items-center px-4 md:px-5">
+          <a href="#" class="text-3xl font-bold text-white font-pacifico">
+            DPBS
+          </a>
+          <ul
+            class="md:flex items-center space-x-8 text-gray-300 font-crimson text-lg hidden"
+          >
+            {% comment %}
+            <li>
+              <span class="text-white border-b border-white"
+                >Setup Step 2/2</span
+              >
+            </li>
+            {% endcomment %}
+            <li>
+              <a
+                href="{% url 'logout' %}"
+                class="hover:text-white transition-colors"
+                >Logout</a
+              >
+            </li>
+          </ul>
+        </nav>
+      </header>
+
+      <main
+        class="relative z-10 flex-grow container mx-auto px-4 pb-12 flex flex-col items-center"
+      >
+        <div
+          class="w-full max-w-5xl mb-6 p-6 md:p-8 rounded-2xl shadow-2xl bg-[#2A5172]/70 bg-opacity-40 border border-white border-opacity-20 backdrop-blur-lg"
+        >
+          <div
+            class="flex flex-col md:flex-row justify-between items-center mb-4"
+          >
+            <div>
+              <h2 class="font-serif text-2xl font-bold text-white mb-1">
+                Total Budget: {{ budget.total_budget }}
+              </h2>
+              <p class="font-sans text-gray-300 text-sm">
+                Allocate your funds to different categories below.
+              </p>
+            </div>
+            <div class="text-right mt-4 md:mt-0">
+              <p
+                class="font-sans text-sm text-gray-300 uppercase tracking-wide"
+              >
+                Remaining
+              </p>
+              <p class="text-3xl font-bold font-serif text-white">
+                {{ remaining }}
+              </p>
+            </div>
+          </div>
+
+          <div
+            class="w-full bg-black/20 rounded-full h-3 overflow-hidden border border-white/20"
+          >
+            <div
+              class="bg-white/80 h-3 rounded-full transition-all duration-500"
+              style="width: {% widthratio total_allocated budget.total_budget 100 %}%"
+            ></div>
+          </div>
+          <div class="text-right text-xs text-gray-300 mt-2">
+            Allocated: {{ total_allocated }}
+          </div>
+        </div>
+
+        <div class="w-full max-w-5xl">
+          {% if messages %} {% for message in messages %}
+          <div
+            class="mb-4 p-3 rounded border bg-[#2A5172]/90 border-white/30 text-white shadow-lg backdrop-blur-md"
+          >
+            {{ message }}
+          </div>
+          {% endfor %} {% endif %}
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full max-w-5xl">
+          <div class="space-y-6">
+            <div
+              class="p-8 rounded-2xl shadow-2xl bg-[#2A5172]/70 bg-opacity-40 border border-white border-opacity-20 backdrop-blur-lg"
+            >
+              <h3
+                class="font-serif text-xl font-bold text-white mb-4 border-b border-white/20 pb-2"
+              >
+                Quick Add
+              </h3>
+
+              <form
+                method="POST"
+                action="{% url 'category_setup' budget.budgetId %}"
+                class="space-y-4"
+              >
+                {% csrf_token %}
+                <input type="hidden" name="action" value="add_predefined" />
+
+                <div class="text-left">
+                  <label class="text-gray-300 text-sm ml-4 mb-1 block"
+                    >Category</label
+                  >
+
+                  <div class="relative">
+                    <select
+                      name="category_type"
+                      class="w-full py-3 pl-5 pr-10 rounded-full bg-white bg-opacity-10 border border-white border-opacity-30 text-gray-900 focus:outline-none focus:ring-2 focus:ring-white/50 cursor-pointer appearance-none"
+                    >
+                      <option value="" disabled selected>
+                        Select a category...
+                      </option>
+                      {% for key, value in predefined_categories %}
+                      <option value="{{ key }}" class="text-black">
+                        {{ value }}
+                      </option>
+                      {% endfor %}
+                    </select>
+
+                    <div
+                      class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-900"
+                    >
+                      <svg
+                        class="h-4 w-4 fill-current"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"
+                        />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="text-left">
+                  <label class="text-gray-300 text-sm ml-4 mb-1 block"
+                    >Amount</label
+                  >
+                  <input
+                    type="number"
+                    step="1"
+                    name="allocated_amount"
+                    placeholder="0.00"
+                    class="w-full py-3 px-5 rounded-full bg-white bg-opacity-10 border border-white border-opacity-30 text-gray-900 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-white/50"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  class="w-full py-3 px-5 rounded-full font-bold text-white bg-[#0C2B58] hover:bg-indigo-950 cursor-pointer border-[#CCCFD1] border mt-2"
+                >
+                  ADD
+                </button>
+              </form>
+            </div>
+
+            <div
+              class="p-8 rounded-2xl shadow-2xl bg-[#2A5172]/70 bg-opacity-40 border border-white border-opacity-20 backdrop-blur-lg"
+            >
+              <h3
+                class="font-serif text-xl font-bold text-white mb-4 border-b border-white/20 pb-2"
+              >
+                Custom Category
+              </h3>
+
+              <form
+                method="POST"
+                action="{% url 'category_setup' budget.budgetId %}"
+                class="space-y-4"
+              >
+                {% csrf_token %}
+                <input type="hidden" name="action" value="add_custom" />
+
+                <div class="text-left">
+                  <label class="text-gray-300 text-sm ml-4 mb-1 block"
+                    >Name</label
+                  >
+                  <input
+                    type="text"
+                    name="custom_category_name"
+                    placeholder="Category Name"
+                    class="w-full py-3 px-5 rounded-full bg-white bg-opacity-10 border border-white border-opacity-30 text-gray-900 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-white/50"
+                  />
+                </div>
+
+                <div class="text-left">
+                  <label class="text-gray-300 text-sm ml-4 mb-1 block"
+                    >Amount</label
+                  >
+                  <input
+                    type="number"
+                    step="1"
+                    name="custom_allocated_amount"
+                    placeholder="0.00"
+                    class="w-full py-3 px-5 rounded-full bg-white bg-opacity-10 border border-white border-opacity-30 text-gray-900 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-white/50"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  class="w-full py-3 px-5 rounded-full font-bold text-white bg-[#0C2B58] hover:bg-indigo-950 cursor-pointer border-[#CCCFD1] border mt-2"
+                >
+                  CREATE CUSTOM
+                </button>
+              </form>
+            </div>
+          </div>
+
+          <div class="flex flex-col h-full">
+            <div
+              class="flex-grow p-8 rounded-2xl shadow-2xl bg-[#2A5172]/70 bg-opacity-40 border border-white border-opacity-20 backdrop-blur-lg flex flex-col"
+            >
+              <h3
+                class="font-serif text-xl font-bold text-white mb-4 flex justify-between items-center border-b border-white/20 pb-2"
+              >
+                <span>Your Allocations</span>
+                <span class="text-sm font-sans bg-white/20 px-2 py-1 rounded"
+                  >{{ existing_categories.count }}</span
+                >
+              </h3>
+
+              <div
+                class="overflow-y-auto max-h-[500px] space-y-3 custom-scrollbar flex-grow"
+              >
+                {% for category in existing_categories %}
+                <div
+                  class="flex justify-between items-center p-4 rounded-xl bg-white bg-opacity-10 border border-white border-opacity-10"
+                >
+                  <div>
+                    <p class="font-bold text-gray-800 text-lg">
+                      {{ category.category_name }}
+                    </p>
+                    <p class="text-xs text-gray-400">
+                      {{ category.is_custom|yesno:"Custom,Standard" }}
+                    </p>
+                  </div>
+                  <div class="flex items-center gap-4">
+                    <span class="font-mono text-white font-bold">
+                      {{ category.allocated_amount }}
+                    </span>
+                    <a
+                      href="{% url 'delete_category' category.categoryId %}"
+                      class="text-gray-400 hover:text-gray-700 transition-colors"
+                    >
+                      <i class="fas fa-trash"></i>
+                    </a>
+                  </div>
+                </div>
+
+                {% empty %}
+                <div class="text-center py-10 text-gray-400">
+                  <p>No categories added yet.</p>
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+
+            <form
+              method="POST"
+              action="{% url 'category_setup' budget.budgetId %}"
+              class="mt-6"
+            >
+              {% csrf_token %}
+              <input type="hidden" name="action" value="finish" />
+              <button
+                type="submit"
+                class="w-full py-4 px-5 rounded-full font-bold text-white bg-[#0C2B58] hover:bg-indigo-950 cursor-pointer border-[#CCCFD1] border shadow-lg text-lg"
+              >
+                FINISH SETUP
+              </button>
+            </form>
+          </div>
+        </div>
+      </main>
+
+      <footer
+        class="relative z-10 container mx-auto px-6 py-4 text-center text-gray-400 text-sm"
+      >
+        <p>© 2025 Dynamic Personal Budget Simulator | UET Peshawar</p>
+      </footer>
+    </div>
+
+    <style>
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 6px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.1);
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 4px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.4);
+      }
+    </style>
+  </body>
+</html>
